@@ -39,10 +39,11 @@ mv $TMP_DIR/go $GOROOT
 echo ""
 echo "Creating $GOPATH/{src,bin,pkg}"
 mkdir -p "$GOPATH"/{src,bin,pkg}
+mkdir -p "$GOPATH/src/github.com/pinterb"
 
 
 ###
-# glide 
+# glide
 ###
 readonly GLIDE_VERSION="0.9.0"
 readonly GLIDE_URL="https://github.com/Masterminds/glide/releases/download/$GLIDE_VERSION/glide-$GLIDE_VERSION-linux-amd64.tar.gz"
@@ -58,7 +59,7 @@ rm -rf $TMP_DIR/linux-amd64
 
 
 ###
-# godep 
+# godep
 ###
 readonly GODEP_VERSION="53"
 readonly GODEP_URL="https://github.com/tools/godep/releases/download/v$GODEP_VERSION/godep_linux_amd64"
