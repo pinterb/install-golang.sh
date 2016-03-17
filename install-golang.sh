@@ -8,6 +8,12 @@
 readonly PROGNAME=$(basename $0)
 readonly PROJECTDIR="$( cd "$(dirname "$0")" ; pwd -P )"
 
+readonly OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+readonly ARCH="$(uname -m)"
+if [ -f "/etc/os-release" ]; then
+  source os_release
+fi
+
 readonly TMP_DIR="/tmp"
 readonly BIN_DIR="$HOME/bin"
 readonly CURL_CMD=`which curl`
@@ -15,7 +21,7 @@ readonly TAR_CMD=`which tar`
 readonly WGET_CMD=`which wget`
 
 readonly GOLANG_VERSION="1.6"
-readonly DOWNLOAD_URL="https://storage.googleapis.com/golang/go$GOLANG_VERSION.linux-amd64.tar.gz"
+readonly DOWNLOAD_URL="https://storage.googleapis.com/golang/go$GOLANG_VERSION.$OS-amd64.tar.gz"
 
 source "$PROJECTDIR/golang_profile"
 
