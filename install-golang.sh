@@ -25,6 +25,7 @@ readonly DOWNLOAD_URL="https://storage.googleapis.com/golang/go$GOLANG_VERSION.$
 
 source "$PROJECTDIR/golang_profile"
 
+
 #if [ "$(id -u)" != "0" ]; then
 #  echo "This script must be run as root" 1>&2
 #  exit 1
@@ -67,6 +68,16 @@ echo ""
 echo "Installing godep"
 $CURL_CMD -Lo "$BIN_DIR/godep" "$GODEP_URL"
 chmod +x $BIN_DIR/godep
+
+
+###
+# cobra
+###
+readonly COBRA_URL="github.com/spf13/cobra/cobra"
+echo ""
+echo "Installing cobra"
+$GOROOT/bin/go get -v "$COBRA_URL"
+cp $PROJECTDIR/cobra.yaml $HOME/.cobra.yaml
 
 
 ###

@@ -14,4 +14,4 @@ else
 fi
 
 export GOPATH=$PROJECTS_HOME/gocode
-
+export PATH=$PATH:$GOPATH/bin
