@@ -95,6 +95,34 @@ else
   grep -q -F 'source "$HOME/.golang_profile"' "$HOME/.profile" || echo 'source "$HOME/.golang_profile"' >> "$HOME/.profile"
 fi
 
+
+###
+# .vim pathogen
+###
+echo "Setting up .vim pathogen"
+if [ -f "$HOME/.vim/autoload/pathogen.vim" ]; then
+  echo "Pathogen appears to already be installed"
+else
+  mkdir -p $HOME/.vim/autoload $HOME/.vim/bundle && \
+  $CURL_CMD -LSso $HOME/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+  git clone git://github.com/tpope/vim-sensible.git $HOME/.vim/bundle/vim-sensible
+fi
+
+if [ -f "$HOME/.vimrc" ]; then
+  echo ".vimrc already exists"
+else
+  echo "execute pathogen#infect()" > $HOME/.vimrc
+  echo "syntax on" >> $HOME/.vimrc
+  echo "filetype plugin indent on" >> $HOME/.vimrc
+fi
+
+if [ -d "$HOME/.vim/bundle/vim-go" ]; then
+  echo "vim-go appears to already be installed"
+else
+  git clone https://github.com/fatih/vim-go.git $HOME/.vim/bundle/vim-go
+fi
+
+
 ###
 # Finished!
 ###
