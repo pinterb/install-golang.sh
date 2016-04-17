@@ -1,17 +1,21 @@
 # Following the following official golang instructions:
 # https://golang.org/doc/install
 
-GOROOT=${GOROOT:-"$HOME/.go"}
+# FOR NOW, DEFAULT TO INSTALLING AT /usr/local
+#GOROOT=${GOROOT:-"$HOME/.go"}
 
-export GOROOT=$GOROOT
+#export GOROOT=$GOROOT
+#export PATH=$PATH:$GOROOT/bin
+export GOROOT=/usr/local/go
 export PATH=$PATH:$GOROOT/bin
 
 # Nitrous environments by default have a $HOME/code dir
 if [ -d "$HOME/code" ]; then
   PROJECTS_HOME="$HOME/code"
+  export GOPATH=$PROJECTS_HOME/gocode
 else
-  PROJECTS_HOME="$HOME/projects"
+  PROJECTS_HOME="$HOME/goprojects"
+  export GOPATH=$PROJECTS_HOME
 fi
 
-export GOPATH=$PROJECTS_HOME/gocode
 export PATH=$PATH:$GOPATH/bin

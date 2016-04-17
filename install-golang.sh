@@ -20,22 +20,30 @@ readonly CURL_CMD=`which curl`
 readonly TAR_CMD=`which tar`
 readonly WGET_CMD=`which wget`
 
-readonly GOLANG_VERSION="1.6"
+readonly GOLANG_VERSION="1.6.1"
 readonly DOWNLOAD_URL="https://storage.googleapis.com/golang/go$GOLANG_VERSION.$OS-amd64.tar.gz"
 
 source "$PROJECTDIR/golang_profile"
 
-
-#if [ "$(id -u)" != "0" ]; then
-#  echo "This script must be run as root" 1>&2
+if [ "$(id -u)" != "0" ]; then
+  echo "This script must be run as root" 1>&2
 #  exit 1
-#fi
+fi
+
+
+echo ""
+echo "Remove any residual artitfacts from previous installs..."
+rm -rf $TMP_DIR/go$GOLANG_VERSION.$OS-amd64.tar.gz
+sudo rm -rf /usr/local/go
+
 
 echo ""
 echo "Installing Go"
-$CURL_CMD $DOWNLOAD_URL | $TAR_CMD -C $TMP_DIR -zx
-rm -rf $GOROOT
-mv $TMP_DIR/go $GOROOT
+#$CURL_CMD $DOWNLOAD_URL | $TAR_CMD -C $TMP_DIR -zx
+$CURL_CMD -o $TMP_DIR/go$GOLANG_VERSION.$OS-amd64.tar.gz $DOWNLOAD_URL
+#rm -rf $GOROOT
+#mv $TMP_DIR/go $GOROOT
+sudo $TAR_CMD -C /usr/local -xzf $TMP_DIR/go$GOLANG_VERSION.$OS-amd64.tar.gz
 
 echo ""
 echo "Creating $GOPATH/{src,bin,pkg}"
@@ -76,8 +84,35 @@ chmod +x $BIN_DIR/godep
 readonly COBRA_URL="github.com/spf13/cobra/cobra"
 echo ""
 echo "Installing cobra"
-$GOROOT/bin/go get -v "$COBRA_URL"
+$GOROOT/bin/go get -u "$COBRA_URL"
 cp $PROJECTDIR/cobra.yaml $HOME/.cobra.yaml
+
+
+###
+# interfacer
+###
+readonly INTERFACER_URL="github.com/mvdan/interfacer/cmd/interfacer"
+echo ""
+echo "Installing interfacer"
+$GOROOT/bin/go get -u "$INTERFACER_URL"
+
+
+###
+# depscheck
+###
+readonly DEPSCHECK_URL="github.com/divan/depscheck"
+echo ""
+echo "Installing depscheck"
+$GOROOT/bin/go get -u "$DEPSCHECK_URL"
+
+
+###
+# gosimple
+###
+readonly GOSIMPLE_URL="honnef.co/go/simple/cmd/gosimple"
+echo ""
+echo "Installing gosimple"
+$GOROOT/bin/go get -u "$GOSIMPLE_URL"
 
 
 ###
