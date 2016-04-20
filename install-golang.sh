@@ -22,10 +22,11 @@ readonly WGET_CMD=`which wget`
 
 readonly GOLANG_VERSION="1.6.1"
 readonly DOWNLOAD_URL="https://storage.googleapis.com/golang/go$GOLANG_VERSION.$OS-amd64.tar.gz"
+readonly DOWNLOADED_FILE="$TMP_DIR/go$GOLANG_VERSION.$OS-amd64.tar.gz"
 
 source "$PROJECTDIR/golang_profile"
 
-INSTALL_CMD="$TAR_CMD -C /usr/local -xzf $TMP_DIR/go$GOLANG_VERSION.$OS-amd64.tar.gz"
+INSTALL_CMD="$TAR_CMD -C /usr/local -xzf $DOWNLOADED_FILE"
 REMOVE_CMD="rm -rf /usr/local/go"
 
 if [ "$(id -u)" != "0" ]; then
@@ -39,16 +40,12 @@ fi
 
 echo ""
 echo "Remove any residual artitfacts from previous installs..."
-rm -rf $TMP_DIR/go$GOLANG_VERSION.$OS-amd64.tar.gz
+rm -rf  $DOWNLOADED_FILE
 $REMOVE_CMD
 
 echo ""
 echo "Installing Go"
-#$CURL_CMD $DOWNLOAD_URL | $TAR_CMD -C $TMP_DIR -zx
-$CURL_CMD -o $TMP_DIR/go$GOLANG_VERSION.$OS-amd64.tar.gz $DOWNLOAD_URL
-#rm -rf $GOROOT
-#mv $TMP_DIR/go $GOROOT
-#sudo $TAR_CMD -C /usr/local -xzf $TMP_DIR/go$GOLANG_VERSION.$OS-amd64.tar.gz
+$CURL_CMD -o  $DOWNLOADED_FILE $DOWNLOAD_URL
 $INSTALL_CMD
 
 echo ""
