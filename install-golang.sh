@@ -26,11 +26,13 @@ readonly DOWNLOAD_URL="https://storage.googleapis.com/golang/go$GOLANG_VERSION.$
 source "$PROJECTDIR/golang_profile"
 
 INSTALL_CMD="$TAR_CMD -C /usr/local -xzf $TMP_DIR/go$GOLANG_VERSION.$OS-amd64.tar.gz"
-REMOVE_CMD="rm -rf $TMP_DIR/go$GOLANG_VERSION.$OS-amd64.tar.gz"
+REMOVE_CMD="rm -rf /usr/local/go"
+
 if [ "$(id -u)" != "0" ]; then
   echo "This script must be run as root" 1>&2
   echo "Will attempt to install using sudo..."
-  INSTALL_CMD="${INSTALL_CMD}sudo"
+  INSTALL_CMD="sudo ${INSTALL_CMD}"
+  REMOVE_CMD="sudo ${REMOVE_CMD}"
 #  exit 1
 fi
 
@@ -38,8 +40,7 @@ fi
 echo ""
 echo "Remove any residual artitfacts from previous installs..."
 rm -rf $TMP_DIR/go$GOLANG_VERSION.$OS-amd64.tar.gz
-sudo rm -rf /usr/local/go
-
+$REMOVE_CMD
 
 echo ""
 echo "Installing Go"
@@ -47,7 +48,8 @@ echo "Installing Go"
 $CURL_CMD -o $TMP_DIR/go$GOLANG_VERSION.$OS-amd64.tar.gz $DOWNLOAD_URL
 #rm -rf $GOROOT
 #mv $TMP_DIR/go $GOROOT
-sudo $TAR_CMD -C /usr/local -xzf $TMP_DIR/go$GOLANG_VERSION.$OS-amd64.tar.gz
+#sudo $TAR_CMD -C /usr/local -xzf $TMP_DIR/go$GOLANG_VERSION.$OS-amd64.tar.gz
+$INSTALL_CMD
 
 echo ""
 echo "Creating $GOPATH/{src,bin,pkg}"
