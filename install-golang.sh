@@ -11,7 +11,7 @@ readonly PROJECTDIR="$( cd "$(dirname "$0")" ; pwd -P )"
 readonly OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
 readonly ARCH="$(uname -m)"
 if [ -f "/etc/os-release" ]; then
-  source os_release
+  source $PROJECTDIR/os_release
 fi
 
 readonly TMP_DIR="/tmp"
@@ -123,14 +123,19 @@ $GOROOT/bin/go get -u "$GOSIMPLE_URL"
 ###
 echo "Setting up profile"
 cp $PROJECTDIR/golang_profile $HOME/.golang_profile
+cp $PROJECTDIR/golang_install $HOME/.golang_install
+sed -i -e "s@###MY_PROJECT_DIR###@${PROJECTDIR}@" $HOME/.golang_install
+sed -i -e "s@###MY_EXE_NAME###@${PROGNAME}@" $HOME/.golang_install
 
 echo ""
 if [ -f "$HOME/.bash_profile" ]; then
   echo "Setting up .bash_profile"
   grep -q -F 'source "$HOME/.golang_profile"' "$HOME/.bash_profile" || echo 'source "$HOME/.golang_profile"' >> "$HOME/.bash_profile"
+  grep -q -F 'source "$HOME/.golang_install"' "$HOME/.bash_profile" || echo 'source "$HOME/.golang_install"' >> "$HOME/.bash_profile"
 else
   echo "Setting up .profile"
   grep -q -F 'source "$HOME/.golang_profile"' "$HOME/.profile" || echo 'source "$HOME/.golang_profile"' >> "$HOME/.profile"
+  grep -q -F 'source "$HOME/.golang_install"' "$HOME/.profile" || echo 'source "$HOME/.golang_install"' >> "$HOME/.profile"
 fi
 
 
