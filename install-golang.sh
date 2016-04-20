@@ -25,8 +25,12 @@ readonly DOWNLOAD_URL="https://storage.googleapis.com/golang/go$GOLANG_VERSION.$
 
 source "$PROJECTDIR/golang_profile"
 
+INSTALL_CMD="$TAR_CMD -C /usr/local -xzf $TMP_DIR/go$GOLANG_VERSION.$OS-amd64.tar.gz"
+REMOVE_CMD="rm -rf $TMP_DIR/go$GOLANG_VERSION.$OS-amd64.tar.gz"
 if [ "$(id -u)" != "0" ]; then
   echo "This script must be run as root" 1>&2
+  echo "Will attempt to install using sudo..."
+  INSTALL_CMD="${INSTALL_CMD}sudo"
 #  exit 1
 fi
 
