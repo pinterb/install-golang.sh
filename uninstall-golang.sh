@@ -17,19 +17,6 @@ source "${PROGDIR}/utils.sh"
 
 # Make sure we have all the right stuff
 prerequisites() {
-  local curl_cmd=`which curl`
-  local tar_cmd=`which tar`
-
-  if [ -z "$curl_cmd" ]; then
-    error "curl does not appear to be installed. Please install and re-run this script."
-    exit 1
-  fi
-  
-  if [ -z "$tar_cmd" ]; then
-    error "tar does not appear to be installed. Please install and re-run this script."
-    exit 1
-  fi
-
   # we want to be root to install / uninstall  
   if [ "$EUID" -ne 0 ]; then
     error "Please run as root"
@@ -38,19 +25,31 @@ prerequisites() {
 }
 
 
-# Install the latest version of Go
-install_golang() {
-  source "$PROGDIR/golang_profile"
+# Uninstall the latest version of Go
+uninstall_golang() {
+  if [ -f "$DOWNLOADED_FILE" ]; then
+    echo ""
+    echo "Removing previous download"
+    rm -rf "$DOWNLOADED_FILE"
+  fi
 
-  echo ""
-  echo "Installing Go"
-  curl -o "$DOWNLOADED_FILE" "$DOWNLOAD_URL"
-  tar -C /usr/local -xzf "$DOWNLOADED_FILE"
+  if [ -d "$INSTALL_DIR/go" ]; then
+    echo ""
+    echo "Removing previous installation"
+    rm -rf "$INSTALL_DIR/go"
+  fi
 
-  echo ""
-  echo "Creating $GOPATH/{src,bin,pkg}"
-  mkdir -p "$GOPATH"/{src,bin,pkg}
-  mkdir -p "$GOPATH/src/github.com/pinterb"
+  if [ -f "$HOME/.golang_profile" ]; then
+    echo ""
+    echo "Removing $HOME/.golang_profile"
+    rm "$HOME/.golang_profile"
+  fi
+
+  if [ -f "$HOME/.golang_install" ]; then
+    echo ""
+    echo "Removing $HOME/.golang_install"
+    rm "$HOME/.golang_install"
+  fi
 }
 
 
@@ -59,7 +58,7 @@ main() {
   set -euo pipefail
   readonly SELF="$(absolute_path $0)"
   prerequisites
-  install_golang
+  uninstall_golang
 }
 
 [[ "$0" == "$BASH_SOURCE" ]] && main

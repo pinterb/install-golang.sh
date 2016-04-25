@@ -1,0 +1,272 @@
+#!/bin/bash
+
+# vim: filetype=sh:tabstop=2:shiftwidth=2:expandtab
+
+# http://www.kfirlavi.com/blog/2012/11/14/defensive-bash-programming/
+
+# Following the following official golang instructions:
+# https://golang.org/doc/install
+
+
+readonly GOLANG_VERSION="1.6.1"
+readonly GLIDE_VERSION="0.9.0"
+readonly GODEP_VERSION="53"
+
+readonly PROGNAME=$(basename $0)
+readonly PROGDIR="$( cd "$(dirname "$0")" ; pwd -P )"
+readonly ARGS="$@"
+
+readonly INSTALL_DIR="/usr/local"
+readonly DOWNLOAD_DIR="/tmp"
+readonly DOWNLOAD_URL="https://storage.googleapis.com/golang/go$GOLANG_VERSION.linux-amd64.tar.gz"
+readonly DOWNLOADED_FILE="$DOWNLOAD_DIR/go$GOLANG_VERSION.linux-amd64.tar.gz"
+
+
+# cli arguments
+DEV_USER=
+
+usage() {
+  cat <<- EOF
+  usage: $PROGNAME options
+    
+  Program deletes files from filesystems to release space. 
+  It gets config file that define fileystem paths to work on, and whitelist rules to 
+  keep certain files.
+
+  OPTIONS:
+    -u --user                local user where third party packages will be installed under ~/bin.
+    -h --help                show this help
+
+    
+  Examples:
+    $PROGNAME --user pinterb 
+EOF
+}
+
+
+cmdline() {
+  # got this idea from here:
+  # http://kirk.webfinish.com/2009/10/bash-shell-script-to-use-getopts-with-gnu-style-long-positional-parameters/
+  local arg=
+  local args= 
+  for arg
+  do
+    local delim=""
+    case "$arg" in
+      #translate --gnu-long-options to -g (short options)
+      --user)           args="${args}-u ";;
+      --help)           args="${args}-h ";;
+      --verbose)        args="${args}-v ";;
+      #pass through anything else
+      *) [[ "${arg:0:1}" == "-" ]] || delim="\""
+          args="${args}${delim}${arg}${delim} ";;
+    esac
+  done
+
+  #Reset the positional parameters to the short options
+  eval set -- $args
+
+  while getopts ":u:h" OPTION
+  do
+     case $OPTION in
+     u)
+         DEV_USER=$OPTARG
+         ;;
+     v)
+         readonly VERBOSE=1
+         ;;
+     h)
+         usage
+         exit 0
+         ;;
+     \:)
+         echo "  argument missing from -$OPTARG option"
+         echo ""
+         usage
+         exit 1 
+         ;;
+     \?)
+         echo "  unknown option: -$OPTARG"
+         echo ""
+         usage
+         exit 1 
+         ;;
+    esac
+  done
+
+
+  return 0
+}
+
+
+valid_args()
+{
+  # Check for required params
+  if [[ -z "$DEV_USER" ]]; then
+    echo -e "\033[31mERROR: a non-privileged user is required"
+    echo -e "\e[0m"
+    usage
+    exit 1
+  fi
+}
+
+
+# Make sure we have all the right stuff
+prerequisites() {
+  local curl_cmd=`which curl`
+  local tar_cmd=`which tar`
+
+  if [ -z "$curl_cmd" ]; then
+    echo "curl does not appear to be installed. Please install and re-run this script."
+    exit 1
+  fi
+  
+  if [ -z "$tar_cmd" ]; then
+    echo "tar does not appear to be installed. Please install and re-run this script."
+    exit 1
+  fi
+
+  # we want to be root to install / uninstall  
+  if [ "$EUID" -ne 0 ]; then
+    echo "Please run as root"
+    exit 1
+  fi
+}
+
+
+# Given a relative path, calculate the absolute path
+absolute_path() {
+  pushd "$(dirname $1)" > /dev/null
+  local abspath="$(pwd -P)"
+  popd > /dev/null
+  echo "$abspath/$(basename $1)"
+}
+
+
+# Uninstall the latest version of Go
+uninstall_golang() {
+  declare download_file="$1"
+
+  if [ -f "$download_file" ]; then
+    echo ""
+    echo "Removing previous download"
+    rm -rf "$download_file"
+  fi
+
+  if [ -d "$INSTALL_DIR/go" ]; then
+    echo ""
+    echo "Removing previous installation"
+    rm -rf "$INSTALL_DIR/go"
+  fi
+
+  if [ -f "$HOME/.golang_profile" ]; then
+    echo ""
+    echo "Removing $HOME/.golang_profile"
+    rm "$HOME/.golang_profile"
+  fi
+
+  if [ -f "$HOME/.golang_install" ]; then
+    echo ""
+    echo "Removing $HOME/.golang_install"
+    rm "$HOME/.golang_install"
+  fi
+}
+
+
+# Install the latest version of Go
+install_golang() {
+  source "$PROGDIR/golang_profile"
+
+  echo ""
+  echo "Installing Go"
+  curl -o "$DOWNLOADED_FILE" "$DOWNLOAD_URL"
+  tar -C /usr/local -xzf "$DOWNLOADED_FILE"
+
+  echo ""
+  echo "Creating $GOPATH/{src,bin,pkg}"
+  mkdir -p "$GOPATH"/{src,bin,pkg}
+  mkdir -p "$GOPATH/src/github.com/pinterb"
+}
+
+
+install_glide() {
+  readonly glide_url="https://github.com/Masterminds/glide/releases/download/$GLIDE_VERSION/glide-$GLIDE_VERSION-linux-amd64.tar.gz"
+
+  echo ""
+  echo "Installing Glide"
+  curl -Lo "$DOWNLOAD_DIR/glide.tar.gz" "$glide_url"
+  cd $DOWNLOAD_DIR && tar -xvf $DOWNLOAD_DIR/glide.tar.gz
+  chmod +x "$DOWNLOAD_DIR/linux-amd64/glide"
+  chown -R "$DEV_USER":"$DEV_USER" "$DOWNLOAD_DIR/linux-amd64"
+  su -c "mkdir -p $HOME/bin" "$DEV_USER" 
+  su -c "mv $DOWNLOAD_DIR/linux-amd64/glide $HOME/bin/" "$DEV_USER"
+  #chmod +x $BIN_DIR/glide
+  rm "$DOWNLOAD_DIR/glide.tar.gz"
+  rm -rf "$DOWNLOAD_DIR/linux-amd64"
+}
+
+
+install_godep() {
+  readonly godep_url="https://github.com/tools/godep/releases/download/v$GODEP_VERSION/godep_linux_amd64"
+
+  echo ""
+  echo "Installing godep"
+  su -c "curl -Lo $HOME/bin/godep $godep_url" "$DEV_USER"
+  su -c "chmod +x $HOME/bin/godep" "$DEV_USER"
+}
+
+
+install_go_gettables() {
+  ###
+  # cobra
+  ###
+  readonly cobra_url="github.com/spf13/cobra/cobra"
+  echo ""
+  echo "Installing cobra"
+  $GOROOT/bin/go get -u "$cobra_url"
+  su -c "cp $PROGDIR/cobra.yaml $HOME/.cobra.yaml" "$DEV_USER"
+
+  ###
+  # interfacer
+  ###
+  readonly interfacer_url="github.com/mvdan/interfacer/cmd/interfacer"
+  echo ""
+  echo "Installing interfacer"
+  $GOROOT/bin/go get -u "$interfacer_url"
+
+
+  ###
+  # depscheck
+  ###
+  readonly depscheck_url="github.com/divan/depscheck"
+  echo ""
+  echo "Installing depscheck"
+  $GOROOT/bin/go get -u "$depscheck_url"
+
+
+  ###
+  # gosimple
+  ###
+  readonly gosimple_url="honnef.co/go/simple/cmd/gosimple"
+  echo ""
+  echo "Installing gosimple"
+  $GOROOT/bin/go get -u "$gosimple_url"
+}
+
+
+main() {
+  # Be unforgiving about errors
+  set -euo pipefail
+  readonly SELF="$(absolute_path $0)"
+  cmdline $ARGS
+  valid_args
+  prerequisites
+  uninstall_golang "$DOWNLOADED_FILE"
+
+  install_golang
+  install_glide
+  install_godep
+  install_go_gettables
+}
+
+[[ "$0" == "$BASH_SOURCE" ]] && main
