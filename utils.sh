@@ -6,6 +6,11 @@ readonly DOWNLOAD_DIR="/tmp"
 readonly DOWNLOAD_URL="https://storage.googleapis.com/golang/go$GOLANG_VERSION.linux-amd64.tar.gz"
 readonly DOWNLOADED_FILE="$DOWNLOAD_DIR/go$GOLANG_VERSION.linux-amd64.tar.gz"
 
+# Get distro data from /etc/os-release
+readonly DISTRO_VER=$(awk -F'=' '/VERSION_ID/ {print $2}' /etc/os-release | tr -d '"')
+readonly DISTRO_ID=$(awk -F'=' '/ID/ {print $2; exit}' /etc/os-release | tr '[:upper:]' '[:lower:]')
+
+
 function warn() {
   echo -e "\033[1;33mWARNING: $1\033[0m"
 }
