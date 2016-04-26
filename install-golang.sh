@@ -24,13 +24,13 @@ prerequisites() {
     error "curl does not appear to be installed. Please install and re-run this script."
     exit 1
   fi
-  
+
   if [ -z "$tar_cmd" ]; then
     error "tar does not appear to be installed. Please install and re-run this script."
     exit 1
   fi
 
-  # we want to be root to install / uninstall  
+  # we want to be root to install / uninstall
   if [ "$EUID" -ne 0 ]; then
     error "Please run as root"
     exit 1
@@ -47,10 +47,15 @@ install_golang() {
   curl -o "$DOWNLOADED_FILE" "$DOWNLOAD_URL"
   tar -C /usr/local -xzf "$DOWNLOADED_FILE"
 
+## This should go in my golang bootstrapper...
+#  echo ""
+#  echo "Creating $GOPATH/{src,bin,pkg}"
+#  mkdir -p "$GOPATH"/{src,bin,pkg}
+#  mkdir -p "$GOPATH/src/github.com/pinterb"
+
   echo ""
-  echo "Creating $GOPATH/{src,bin,pkg}"
-  mkdir -p "$GOPATH"/{src,bin,pkg}
-  mkdir -p "$GOPATH/src/github.com/pinterb"
+  echo "Updating /etc/profile"
+  cp "$PROGDIR/golang_profile" /etc/profile.d/golang.sh
 }
 
 
