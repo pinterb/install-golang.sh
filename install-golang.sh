@@ -40,7 +40,7 @@ prerequisites() {
 
 # Install the latest version of Go
 install_golang() {
-  source "$PROGDIR/golang_profile"
+#  source "$PROGDIR/golang_profile"
 
   echo ""
   echo "Installing Go"
