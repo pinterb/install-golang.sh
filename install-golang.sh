@@ -46,6 +46,7 @@ install_golang() {
   echo "Installing Go"
   curl -o "$DOWNLOADED_FILE" "$DOWNLOAD_URL"
   tar -C /usr/local -xzf "$DOWNLOADED_FILE"
+  rm "$DOWNLOADED_FILE"
 
   echo ""
   echo "Updating /etc/profile"
