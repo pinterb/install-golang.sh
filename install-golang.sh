@@ -47,12 +47,6 @@ install_golang() {
   curl -o "$DOWNLOADED_FILE" "$DOWNLOAD_URL"
   tar -C /usr/local -xzf "$DOWNLOADED_FILE"
 
-## This should go in my golang bootstrapper...
-#  echo ""
-#  echo "Creating $GOPATH/{src,bin,pkg}"
-#  mkdir -p "$GOPATH"/{src,bin,pkg}
-#  mkdir -p "$GOPATH/src/github.com/pinterb"
-
   echo ""
   echo "Updating /etc/profile"
   cp "$PROGDIR/golang_profile" /etc/profile.d/golang.sh
