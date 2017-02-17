@@ -38,6 +38,15 @@ prerequisites() {
 }
 
 
+# Uninstall the current installed version of Go
+uninstall_golang() {
+
+  echo ""
+  echo "Uninstalling Go"
+  rm -rf /usr/local/go
+}
+
+
 # Install the latest version of Go
 install_golang() {
 #  source "$PROGDIR/golang_profile"
@@ -58,7 +67,9 @@ main() {
   # Be unforgiving about errors
   set -euo pipefail
   readonly SELF="$(absolute_path $0)"
+
   prerequisites
+  uninstall_golang
   install_golang
 }
 

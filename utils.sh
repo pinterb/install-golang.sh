@@ -1,6 +1,6 @@
 #!/bin/bash -
 
-readonly GOLANG_VERSION="1.7.1"
+readonly GOLANG_VERSION="1.8"
 readonly INSTALL_DIR="/usr/local"
 readonly DOWNLOAD_DIR="/tmp"
 readonly DOWNLOAD_URL="https://storage.googleapis.com/golang/go$GOLANG_VERSION.linux-amd64.tar.gz"
