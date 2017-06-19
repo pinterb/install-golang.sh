@@ -17,7 +17,7 @@ source "${PROGDIR}/utils.sh"
 
 # Make sure we have all the right stuff
 prerequisites() {
-  # we want to be root to install / uninstall  
+  # we want to be root to install / uninstall
   if [ "$EUID" -ne 0 ]; then
     error "Please run as root"
     exit 1
