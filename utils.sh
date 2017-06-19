@@ -1,10 +1,10 @@
 #!/bin/bash -
 
 readonly GOLANG_VERSION="1.8.3"
-readonly INSTALL_DIR="/usr/local"
-readonly DOWNLOAD_DIR="/tmp"
-readonly DOWNLOAD_URL="https://storage.googleapis.com/golang/go$GOLANG_VERSION.linux-amd64.tar.gz"
-readonly DOWNLOADED_FILE="$DOWNLOAD_DIR/go$GOLANG_VERSION.linux-amd64.tar.gz"
+readonly GOLANG_INSTALL_DIR="/usr/local"
+readonly GOLANG_DOWNLOAD_DIR="/tmp"
+readonly GOLANG_DOWNLOAD_URL="https://storage.googleapis.com/golang/go$GOLANG_VERSION.linux-amd64.tar.gz"
+readonly GOLANG_DOWNLOADED_FILE="$GOLANG_DOWNLOAD_DIR/go$GOLANG_VERSION.linux-amd64.tar.gz"
 
 # Get distro data from /etc/os-release
 if [ -f /etc/lsb-release ]; then
@@ -27,10 +27,6 @@ else
     DISTRO_ID=$(uname -s)
     DISTRO_VER=$(uname -r)
 fi
-
-
-readonly TRUE=0
-readonly FALSE=1
 
 
 warn() {

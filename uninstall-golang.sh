@@ -27,16 +27,16 @@ prerequisites() {
 
 # Uninstall the latest version of Go
 uninstall_golang() {
-  if [ -f "$DOWNLOADED_FILE" ]; then
+  if [ -f "$GOLANG_DOWNLOADED_FILE" ]; then
     echo ""
     echo "Removing previous download"
-    rm -rf "$DOWNLOADED_FILE"
+    rm -rf "$GOLANG_DOWNLOADED_FILE"
   fi
 
-  if [ -d "$INSTALL_DIR/go" ]; then
+  if [ -d "$GOLANG_INSTALL_DIR/go" ]; then
     echo ""
     echo "Removing previous installation"
-    rm -rf "$INSTALL_DIR/go"
+    rm -rf "$GOLANG_INSTALL_DIR/go"
   fi
 
   if [ -f "$HOME/.golang_profile" ]; then

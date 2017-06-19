@@ -41,9 +41,11 @@ prerequisites() {
 # Uninstall the current installed version of Go
 uninstall_golang() {
 
-  echo ""
-  echo "Uninstalling Go"
-  rm -rf /usr/local/go
+  if [ -d "$GOLANG_INSTALL_DIR/go" ]; then
+    echo ""
+    echo "Removing previous installation"
+    rm -rf "$GOLANG_INSTALL_DIR/go"
+  fi
 }
 
 
@@ -53,9 +55,9 @@ install_golang() {
 
   echo ""
   echo "Installing Go"
-  curl -o "$DOWNLOADED_FILE" "$DOWNLOAD_URL"
-  tar -C /usr/local -xzf "$DOWNLOADED_FILE"
-  rm "$DOWNLOADED_FILE"
+  curl -o "$GOLANG_DOWNLOADED_FILE" "$GOLANG_DOWNLOAD_URL"
+  tar -C /usr/local -xzf "$GOLANG_DOWNLOADED_FILE"
+  rm "$GOLANG_DOWNLOADED_FILE"
 
   echo ""
   echo "Updating /etc/profile"
