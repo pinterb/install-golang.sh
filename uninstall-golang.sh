@@ -50,6 +50,12 @@ uninstall_golang() {
     echo "Removing $HOME/.golang_install"
     rm "$HOME/.golang_install"
   fi
+  
+  if [ -f "/etc/profile.d/golang.sh" ]; then
+    echo ""
+    echo "Removing /etc/profile.d/golang.sh"
+    rm "/etc/profile.d/golang.sh"
+  fi
 }
 
 
